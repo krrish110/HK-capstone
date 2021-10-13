@@ -1,0 +1,215 @@
+```{r}
+library(RCurl)
+library(dplyr)
+library(ggplot2)
+library(ggExtra)
+library(party)
+```
+
+```{r}
+data<-read.csv("C:/Users/hanum/Desktop/capstone/nyc-flights.csv")
+```
+
+```{r}
+class(data)
+```
+
+```{r}
+nrow(data)
+```
+
+```{r}
+ncol(data)
+```
+
+```{r}
+str(data)
+```
+
+```{r}
+summary(data)
+```
+
+```{r}
+sum(is.na("nyc-flights"))
+```
+
+```{r}
+qqnorm(data$month)
+qqline(data$month)
+```
+
+```{r}
+sapply(data,class)
+```
+
+```{r}
+as.numeric(data$minute)
+```
+
+```{r}
+as.numeric(data$distance)
+```
+
+```{r}
+sapply(data,class)
+```
+
+```{r}
+cor(data$minute,data$distance)
+```
+
+```{r}
+sub_set <- data[c(5,7,8,14)]
+sub_set
+```
+
+```{r}
+summary(sub_set)
+```
+
+```{r}
+sample_100 <- sample_n(sub_set, 100)
+
+summary(sample_100)
+```
+
+```{r}
+theme_set(theme_bw())
+g <- ggplot(sub_set, aes(dep_delay, arr_delay)) + 
+  geom_count() + 
+  geom_smooth(method="lm", se=F)
+
+ggMarginal(g, type = "histogram", fill="transparent")
+```
+
+```{r}
+sample_100 <- sample_n(sub_set, 100)
+
+summary(sample_100)
+```
+
+```{r}
+g <- ggplot(sample_100, aes(dep_delay, arr_delay)) + 
+  geom_count() + 
+  geom_smooth(method="lm", se=F)
+
+ggMarginal(g, type = "histogram", fill="transparent")
+```
+
+```{r}
+theme_set(theme_bw())
+ggplot(sample_100, aes(dep_delay, arr_delay)) + 
+  geom_jitter(aes(colour = dep_delay, size = arr_delay), na.rm = TRUE)
+```
+
+```{r}
+data %>% 
+  filter(!is.na(arr_delay)) %>% 
+  group_by(dest) %>% 
+  summarize(avg_arr_delay = mean(arr_delay)) %>% 
+  arrange(desc(avg_arr_delay))
+```
+```{r}
+head(data)
+class(data)
+```
+
+```{r}
+data %>% 
+  filter(!is.na(arr_delay)) %>% 
+  group_by(dest, month) %>% 
+  summarize(avg_arr_delay = mean(arr_delay)) %>% 
+  arrange(dest, desc(avg_arr_delay))
+```
+
+```{r}
+data %>% 
+  filter(!is.na(arr_delay)) %>% 
+  group_by(dest, carrier) %>% 
+  summarize(avg_arr_delay = mean(arr_delay)) %>% 
+  arrange(dest, desc(avg_arr_delay))
+
+```
+
+```{r}
+as.numeric(data$dist)
+```
+
+```{r}
+data_ctree<- ctree(distance~minute,data=data)
+```
+
+```{r}
+plot(data_ctree,type="simple")
+```
+
+```{r}
+train_index<-sample(1:nrow(data),0.7*nrow(data))
+train.set<-data[train_index,]
+test.set<-data[-train_index,]
+```
+
+```{r}
+data_ctree_model<-ctree(distance~minute,data=train.set)
+data_ctree_model
+```
+
+```{r}
+data_ctree_prediction<-predict(data_ctree_model,test.set)
+head(data_ctree_prediction)
+```
+
+```{r}
+table(data_ctree_prediction,test.set$distance)
+```
+
+```{r}
+nrow(data)
+```
+```{r}
+head(data)
+```
+```{r}
+set.seed(1)
+```
+
+```{r}
+train_index=sample(1:nrow(data),0.7*nrow(data))
+```
+
+```{r}
+train_set=data[train_index,]
+```
+
+```{r}
+head(train_set)
+```
+
+```{r}
+test_set=data[-train_index,]
+```
+
+```{r}
+head(test_set)
+```
+
+```{r}
+indep_train_set=train_set[-5]
+```
+
+```{r}
+indep_train_set
+```
+
+```{r}
+data %>% 
+  filter(!is.na(dep_delay) & !is.na(arr_delay)) %>% 
+  group_by(year, month, day) %>% 
+  summarise(
+    first = min(dep_time),
+    last = max(dep_time)
+  )
+```
+
+
